@@ -676,13 +676,22 @@
             }
 
             const indexTip = hand[8];
-            const thumbTip = hand[4];
-            
-            // 2D 灵敏捏合检测
-            const dx = indexTip.x - thumbTip.x;
-            const dy = indexTip.y - thumbTip.y;
-            const dist2D = Math.hypot(dx, dy);
-            const rawPinching = dist2D < 0.045; // 稳定好写的阈值
+            const wrist = hand[0];
+            const indexMcp = hand[5];
+            const middleTip = hand[12];
+            const middleMcp = hand[9];
+            const ringTip = hand[16];
+            const ringMcp = hand[13];
+            const pinkyTip = hand[20];
+            const pinkyMcp = hand[17];
+
+            const distanceFromWrist = point => Math.hypot(point.x - wrist.x, point.y - wrist.y);
+            const fingerRatio = (tip, mcp) => distanceFromWrist(tip) / Math.max(distanceFromWrist(mcp), 0.0001);
+            const rawPinching =
+                fingerRatio(indexTip, indexMcp) > 1.35 &&
+                fingerRatio(middleTip, middleMcp) < 1.35 &&
+                fingerRatio(ringTip, ringMcp) < 1.35 &&
+                fingerRatio(pinkyTip, pinkyMcp) < 1.35;
 
             // 移动缓冲区去抖
             globalPinchBuffer.push(rawPinching);
@@ -703,17 +712,23 @@
                     lastPen = { x: drawX, y: drawY };
                     return;
                 }
+                const smoothFactor = 0.5;
+                const smoothX = lastPen.x + (drawX - lastPen.x) * smoothFactor;
+                const smoothY = lastPen.y + (drawY - lastPen.y) * smoothFactor;
+                const midX = (lastPen.x + smoothX) / 2;
+                const midY = (lastPen.y + smoothY) / 2;
+
                 dctx.save();
                 dctx.beginPath();
-                dctx.moveTo(lastPen.x, lastPen.y);
-                dctx.lineTo(drawX, drawY);
+                dctx.moveTo(lastPen.midX ?? lastPen.x, lastPen.midY ?? lastPen.y);
+                dctx.quadraticCurveTo(lastPen.x, lastPen.y, midX, midY);
                 dctx.strokeStyle = inkColor;
                 dctx.lineWidth = 6;
                 dctx.shadowColor = inkShadowColor;
                 dctx.shadowBlur = 8;
                 dctx.stroke();
                 dctx.restore();
-                lastPen = { x: drawX, y: drawY };
+                lastPen = { x: smoothX, y: smoothY, midX, midY };
             } else {
                 isDrawing = false;
                 lastPen = null;
@@ -870,10 +885,23 @@
 
         function isPinchingHand(hand) {
             if (!hand) return false;
+            const wrist = hand[0];
             const indexTip = hand[8];
-            const thumbTip = hand[4];
-            const dist2D = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
-            return dist2D < 0.045;
+            const indexMcp = hand[5];
+            const middleTip = hand[12];
+            const middleMcp = hand[9];
+            const ringTip = hand[16];
+            const ringMcp = hand[13];
+            const pinkyTip = hand[20];
+            const pinkyMcp = hand[17];
+
+            const distanceFromWrist = point => Math.hypot(point.x - wrist.x, point.y - wrist.y);
+            const fingerRatio = (tip, mcp) => distanceFromWrist(tip) / Math.max(distanceFromWrist(mcp), 0.0001);
+
+            return fingerRatio(indexTip, indexMcp) > 1.35 &&
+                fingerRatio(middleTip, middleMcp) < 1.35 &&
+                fingerRatio(ringTip, ringMcp) < 1.35 &&
+                fingerRatio(pinkyTip, pinkyMcp) < 1.35;
         }
 
         function isFistHand(hand) {
