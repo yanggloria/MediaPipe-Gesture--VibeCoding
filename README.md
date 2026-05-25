@@ -15,9 +15,52 @@
 - 双手张开、握拳、挥动控制星云球缩放、旋转和推进；
 - 页面采用赛博科技风格界面。
 
-## 本仓库当前修改版本
+## 当前仓库内容说明
 
-当前仓库运行的是修改后的版本，主要在原始代码基础上做了以下调整：
+本仓库目前包含两部分内容：
+
+```text
+MediaPipe-Gesture--VibeCoding/
+├── app.py
+├── README.md
+├── templates/
+│   └── index_v4.html
+└── releases/
+    └── MediaPipe-Gesture--VibeCoding_index_finger_write_smooth_original_bg.zip
+```
+
+### 1. 根目录代码
+
+根目录中的 `app.py` 和 `templates/index_v4.html` 是 Flask 项目的基础运行结构。
+
+`app.py` 使用 Flask 加载 `templates/index_v4.html`：
+
+```python
+from flask import Flask, render_template
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template('index_v4.html')
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5001)
+```
+
+### 2. 最终修改版压缩包
+
+最终修改版已经打包保存在：
+
+```text
+releases/MediaPipe-Gesture--VibeCoding_index_finger_write_smooth_original_bg.zip
+```
+
+这个压缩包是当前项目的最终版本备份。
+
+## 最终修改版说明
+
+最终版本是在原始代码基础上完成的修改，主要改动如下：
 
 ### 1. 写字方式修改
 
@@ -25,7 +68,7 @@
 
 - 需要大拇指和食指捏合才会进入写字状态。
 
-当前版本：
+最终版本：
 
 - 改为只伸出食指即可写字；
 - 使用食指指尖作为笔尖位置；
@@ -38,47 +81,23 @@
 - 使用普通直线连接轨迹点；
 - 快速移动时，字迹可能会出现折线感。
 
-当前版本：
+最终版本：
 
 - 加入轨迹平滑处理；
 - 使用二次贝塞尔曲线连接轨迹；
 - 写字效果更加顺滑自然。
 
-### 3. 背景画板颜色调整
+### 3. 背景画板颜色恢复
 
-原始版本：
+中间修改版本曾经将背景画板颜色调淡。
 
-- 写字模式背景整体偏深，粉紫光晕较强。
-
-当前版本：
-
-- 背景画板颜色稍微变淡；
-- 粉紫光晕透明度降低；
-- 画面更柔和，写字内容更容易观察。
-
-## 文件说明
-
-```text
-MediaPipe-Gesture--VibeCoding/
-├── app.py
-├── README.md
-└── templates/
-    └── index_v4.html
-```
-
-### app.py
-
-Flask 程序入口文件。
-
-当前版本中，`app.py` 会读取 `templates/index_v4.html`，并在运行时应用以下修改：
+最终版本已经将背景画板颜色恢复为原来的深色粉紫效果，同时保留：
 
 - 食指写字；
 - 写字轨迹平滑；
-- 背景画板颜色淡化。
-
-### templates/index_v4.html
-
-原始页面模板文件，包含主要前端界面、MediaPipe 手势识别逻辑、Three.js 星云交互逻辑和画布绘制逻辑。
+- 原有左手翻页；
+- 原有左手换颜色；
+- 原有量子星云交互模式。
 
 ## 运行方法
 
@@ -141,5 +160,7 @@ http://127.0.0.1:5001
 - 从源项目复制 Flask 入口文件和前端模板文件；
 - 修改写字触发方式：由“大拇指 + 食指捏合写字”改为“只伸食指写字”；
 - 优化写字轨迹：加入平滑处理和二次贝塞尔曲线；
-- 调整写字模式背景画板颜色，使背景稍微变淡；
+- 曾尝试将写字模式背景画板颜色调淡；
+- 后续将背景画板颜色恢复为原来的深色粉紫效果；
+- 上传最终版压缩包到 `releases/` 目录；
 - 更新项目说明文档。
